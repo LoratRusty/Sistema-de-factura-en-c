@@ -1,5 +1,5 @@
-# Factura-en-c
-Esto es una factura en el lenguaje C. Dentro de ella conseguirás todos los comentarios necesarios para entenderla Suerte.
-Agradezco a @fonstack (https://github.com/fonstack) y a @Pedro (https://www.lawebdelprogramador.com/foros/usuario.php?id=f1637717) 
-Me guie de su codigo para crear el mio propio.
-Este fue mi primer programa funcional 
+# Sistema de factura en C
+Esto es un Sistema de Facturación en lenguaje C. 
+Dentro de ella conseguirás todos los comentarios necesarios para entenderla.
+Este fue mi primer programa funcional.
+Se uso Dev c++ para la compilación y ejecución del programa.
