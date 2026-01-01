@@ -3,207 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuenta Regresiva | Año Nuevo 2026</title>
+    <title>Año Nuevo 2026 | Cuenta Regresiva</title>
     <style>
-        /* Estilos Generales */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap');
+        /* Importando fuentes elegantes */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;400;700&display=swap');
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            background-color: #000;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
             height: 100vh;
+            width: 100vw;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
-            overflow: hidden;
-            text-align: center;
+            flex-direction: column;
         }
 
-        /* Fondo de Estrellas Animado */
-        .stars-container {
+        /* Lienzo para las partículas de fondo */
+        #bg-canvas {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            z-index: 1;
         }
 
         /* Contenedor Principal */
-        .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
-            max-width: 90%;
+        .main-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            width: 90%;
+            max-width: 1200px;
         }
 
-        h1 {
+        h2 {
+            font-family: 'Cinzel', serif;
             font-size: 2.5rem;
-            margin-bottom: 2rem;
+            letter-spacing: 15px;
+            margin-bottom: 1rem;
+            color: #d4af37; /* Color Oro */
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
             text-transform: uppercase;
-            letter-spacing: 5px;
-            background: linear-gradient(to right, #fff, #ffd700);
+        }
+
+        .year {
+            font-size: 8rem;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            background: linear-gradient(180deg, #fff 30%, #d4af37 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.3));
         }
 
-        /* El Contador */
-        .countdown {
+        /* Estilos del Contador */
+        .countdown-container {
             display: flex;
-            gap: 20px;
             justify-content: center;
-            flex-wrap: wrap;
+            gap: 40px;
         }
 
-        .box {
-            min-width: 100px;
+        .time-segment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 180px;
         }
 
-        .box span {
-            display: block;
-            font-size: 3.5rem;
-            font-weight: 700;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 10px;
+        .number {
+            font-size: 7rem;
+            font-weight: 200;
+            line-height: 1;
             margin-bottom: 10px;
-            border-bottom: 4px solid #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
         }
 
-        .box p {
-            font-size: 0.9rem;
+        .label {
+            font-size: 1.2rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #ccc;
+            letter-spacing: 5px;
+            color: #d4af37;
+            font-weight: 400;
         }
 
-        /* Mensaje de Feliz Año */
-        #message {
-            font-size: 3rem;
+        /* Separador entre números */
+        .separator {
+            font-size: 5rem;
+            padding-top: 10px;
+            color: rgba(212, 175, 55, 0.5);
+        }
+
+        /* Mensaje Final */
+        #celebration-msg {
             display: none;
-            font-weight: bold;
-            color: #ffd700;
-            text-shadow: 0 0 20px gold;
-            animation: pulse 2s infinite;
+            font-family: 'Cinzel', serif;
+            font-size: 6rem;
+            color: #d4af37;
+            text-shadow: 0 0 50px gold;
+            animation: grow 2s infinite alternate;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        @keyframes grow {
+            from { transform: scale(0.95); opacity: 0.8; }
+            to { transform: scale(1.05); opacity: 1; }
         }
 
-        /* Responsivo para móviles */
-        @media (max-width: 600px) {
-            h1 { font-size: 1.5rem; }
-            .box { min-width: 70px; }
-            .box span { font-size: 2rem; }
+        /* Responsivo para televisores pequeños o tablets */
+        @media (max-width: 1000px) {
+            .number { font-size: 4rem; }
+            .year { font-size: 5rem; }
+            .time-segment { min-width: 100px; }
+            .countdown-container { gap: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="stars-container" id="stars"></div>
+    <canvas id="bg-canvas"></canvas>
 
-    <div class="container">
-        <h1 id="title">Faltan para 2026</h1>
-        
-        <div class="countdown" id="countdown">
-            <div class="box">
-                <span id="days">00</span>
-                <p>Días</p>
-            </div>
-            <div class="box">
-                <span id="hours">00</span>
-                <p>Horas</p>
-            </div>
-            <div class="box">
-                <span id="minutes">00</span>
-                <p>Minutos</p>
-            </div>
-            <div class="box">
-                <span id="seconds">00</span>
-                <p>Segundos</p>
+    <div class="main-content">
+        <div id="countdown-ui">
+            <h2>Hacia el año</h2>
+            <div class="year">2026</div>
+            
+            <div class="countdown-container">
+                <div class="time-segment">
+                    <div class="number" id="days">000</div>
+                    <div class="label">Días</div>
+                </div>
+                <div class="separator">:</div>
+                <div class="time-segment">
+                    <div class="number" id="hours">00</div>
+                    <div class="label">Horas</div>
+                </div>
+                <div class="separator">:</div>
+                <div class="time-segment">
+                    <div class="number" id="minutes">00</div>
+                    <div class="label">Minutos</div>
+                </div>
+                <div class="separator">:</div>
+                <div class="time-segment">
+                    <div class="number" id="seconds">00</div>
+                    <div class="label">Segundos</div>
+                </div>
             </div>
         </div>
 
-        <div id="message">¡FELIZ AÑO NUEVO 2026! 🥂✨</div>
+        <div id="celebration-msg">
+            ¡FELIZ 2026!
+        </div>
     </div>
 
     <script>
-        // Configurar la fecha del objetivo (1 de enero de 2026)
-        const targetDate = new Date('Jan 1, 2026 00:00:00').getTime();
+        // --- LÓGICA DE LA CUENTA REGRESIVA ---
+        const targetDate = new Date('January 1, 2026 00:00:00').getTime();
 
         function updateCountdown() {
             const now = new Date().getTime();
-            const difference = targetDate - now;
+            const diff = targetDate - now;
 
-            // Cálculos de tiempo
-            const d = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((difference % (1000 * 60)) / 1000);
+            if (diff <= 0) {
+                document.getElementById('countdown-ui').style.display = 'none';
+                document.getElementById('celebration-msg').style.display = 'block';
+                return;
+            }
 
-            // Mostrar resultados con ceros a la izquierda
-            document.getElementById('days').innerText = d < 10 ? '0' + d : d;
-            document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
-            document.getElementById('minutes').innerText = m < 10 ? '0' + m : m;
-            document.getElementById('seconds').innerText = s < 10 ? '0' + s : s;
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
 
-            // Si la cuenta llega a cero
-            if (difference < 0) {
-                clearInterval(interval);
-                document.getElementById('countdown').style.display = 'none';
-                document.getElementById('title').style.display = 'none';
-                document.getElementById('message').style.display = 'block';
-                createFireworks();
+            document.getElementById('days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // --- LÓGICA DEL FONDO ANIMADO (Partículas) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.init();
+            }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * -0.5; // Siempre hacia arriba
+                this.color = Math.random() > 0.5 ? '#d4af37' : '#ffffff';
+                this.opacity = Math.random();
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.x < 0 || this.x > canvas.width) this.init();
+            }
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
 
-        // Ejecutar cada segundo
-        const interval = setInterval(updateCountdown, 1000);
-
-        // Crear estrellas de fondo de forma aleatoria
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.style.position = 'absolute';
-                star.style.width = '2px';
-                star.style.height = '2px';
-                star.style.background = 'white';
-                star.style.top = Math.random() * 100 + 'vh';
-                star.style.left = Math.random() * 100 + 'vw';
-                star.style.borderRadius = '50%';
-                star.style.opacity = Math.random();
-                star.style.animation = `twinkle ${Math.random() * 5 + 2}s infinite`;
-                starsContainer.appendChild(star);
+        function createParticles() {
+            for (let i = 0; i < 150; i++) {
+                particles.push(new Particle());
             }
         }
 
-        // Añadir animación de parpadeo a las estrellas
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes twinkle {
-                0%, 100% { opacity: 0.3; }
-                50% { opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
 
-        createStars();
-        updateCountdown(); // Ejecutar inmediatamente al cargar
+        createParticles();
+        animate();
     </script>
 </body>
 </html>
