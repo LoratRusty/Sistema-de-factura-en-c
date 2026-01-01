@@ -5,14 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Año Nuevo 2026 | Cuenta Regresiva</title>
     <style>
-        /* Importando fuentes elegantes */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;400;700&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: #000;
@@ -27,15 +22,8 @@
             flex-direction: column;
         }
 
-        /* Lienzo para las partículas de fondo */
-        #bg-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
+        #bg-canvas { position: absolute; top: 0; left: 0; z-index: 1; }
 
-        /* Contenedor Principal */
         .main-content {
             position: relative;
             z-index: 10;
@@ -49,7 +37,7 @@
             font-size: 2.5rem;
             letter-spacing: 15px;
             margin-bottom: 1rem;
-            color: #d4af37; /* Color Oro */
+            color: #d4af37;
             text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
             text-transform: uppercase;
         }
@@ -65,7 +53,6 @@
             filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.3));
         }
 
-        /* Estilos del Contador */
         .countdown-container {
             display: flex;
             justify-content: center;
@@ -76,7 +63,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 180px;
+            min-width: 150px;
         }
 
         .number {
@@ -92,17 +79,40 @@
             text-transform: uppercase;
             letter-spacing: 5px;
             color: #d4af37;
-            font-weight: 400;
         }
 
-        /* Separador entre números */
-        .separator {
-            font-size: 5rem;
-            padding-top: 10px;
-            color: rgba(212, 175, 55, 0.5);
+        .separator { font-size: 5rem; color: rgba(212, 175, 55, 0.5); }
+
+        /* Estilo del botón de activación */
+        #audio-btn-container {
+            position: absolute;
+            bottom: 40px;
+            z-index: 100;
         }
 
-        /* Mensaje Final */
+        .btn-audio {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+
+        .btn-audio:hover { background: #d4af37; color: #000; }
+
+        /* Contenedor de YouTube oculto */
+        #youtube-player {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
         #celebration-msg {
             display: none;
             font-family: 'Cinzel', serif;
@@ -117,12 +127,11 @@
             to { transform: scale(1.05); opacity: 1; }
         }
 
-        /* Responsivo para televisores pequeños o tablets */
         @media (max-width: 1000px) {
-            .number { font-size: 4rem; }
-            .year { font-size: 5rem; }
-            .time-segment { min-width: 100px; }
-            .countdown-container { gap: 15px; }
+            .number { font-size: 3.5rem; }
+            .year { font-size: 4rem; }
+            .time-segment { min-width: 80px; }
+            .countdown-container { gap: 10px; }
         }
     </style>
 </head>
@@ -134,46 +143,79 @@
         <div id="countdown-ui">
             <h2>Hacia el año</h2>
             <div class="year">2026</div>
-            
             <div class="countdown-container">
-                <div class="time-segment">
-                    <div class="number" id="days">000</div>
-                    <div class="label">Días</div>
-                </div>
+                <div class="time-segment"><div class="number" id="days">00</div><div class="label">Días</div></div>
                 <div class="separator">:</div>
-                <div class="time-segment">
-                    <div class="number" id="hours">00</div>
-                    <div class="label">Horas</div>
-                </div>
+                <div class="time-segment"><div class="number" id="hours">00</div><div class="label">Horas</div></div>
                 <div class="separator">:</div>
-                <div class="time-segment">
-                    <div class="number" id="minutes">00</div>
-                    <div class="label">Minutos</div>
-                </div>
+                <div class="time-segment"><div class="number" id="minutes">00</div><div class="label">Minutos</div></div>
                 <div class="separator">:</div>
-                <div class="time-segment">
-                    <div class="number" id="seconds">00</div>
-                    <div class="label">Segundos</div>
-                </div>
+                <div class="time-segment"><div class="number" id="seconds">00</div><div class="label">Segundos</div></div>
             </div>
         </div>
-
-        <div id="celebration-msg">
-            ¡FELIZ 2026!
-        </div>
+        <div id="celebration-msg">¡FELIZ 2026!</div>
     </div>
 
+    <!-- Botón necesario para habilitar el sonido -->
+    <div id="audio-btn-container">
+        <button class="btn-audio" id="btn-activate">SINCRONIZAR MÚSICA (5 PA LAS 12)</button>
+    </div>
+
+    <!-- Contenedor del reproductor de YouTube -->
+    <div id="youtube-player"></div>
+
     <script>
-        // --- LÓGICA DE LA CUENTA REGRESIVA ---
+        // --- CONFIGURACIÓN ---
         const targetDate = new Date('January 1, 2026 00:00:00').getTime();
+        let player;
+        let songStarted = false;
+        const triggerTimeMs = (3 * 60 + 3) * 1000; // 3 min 3 seg en milisegundos
+
+        // Cargar la API de YouTube
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: '8IeNfL_Q_x8', // ID oficial de "5 pa las 12 - Diomedes"
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            document.getElementById('btn-activate').addEventListener('click', function() {
+                // El navegador ahora permite sonido porque hubo un click
+                player.playVideo();
+                player.pauseVideo();
+                player.seekTo(0);
+                this.innerText = "MÚSICA PROGRAMADA ✔";
+                this.style.borderColor = "#4CAF50";
+                this.style.color = "#4CAF50";
+            });
+        }
 
         function updateCountdown() {
             const now = new Date().getTime();
             const diff = targetDate - now;
 
+            // Disparar música a los 3:03
+            if (diff <= triggerTimeMs && diff > 0 && !songStarted) {
+                if (player && player.playVideo) {
+                    player.playVideo();
+                    songStarted = true;
+                }
+            }
+
             if (diff <= 0) {
                 document.getElementById('countdown-ui').style.display = 'none';
                 document.getElementById('celebration-msg').style.display = 'block';
+                document.getElementById('audio-btn-container').style.display = 'none';
                 return;
             }
 
@@ -191,63 +233,28 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // --- LÓGICA DEL FONDO ANIMADO (Partículas) ---
+        // --- PARTÍCULAS (Mismo código original) ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize);
         resize();
-
         class Particle {
-            constructor() {
-                this.init();
-            }
+            constructor() { this.init(); }
             init() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.size = Math.random() * 2 + 0.5;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * -0.5; // Siempre hacia arriba
+                this.speedY = Math.random() * -0.5;
                 this.color = Math.random() > 0.5 ? '#d4af37' : '#ffffff';
                 this.opacity = Math.random();
             }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.x < 0 || this.x > canvas.width) this.init();
-            }
-            draw() {
-                ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            update() { this.y += this.speedY; if (this.y < 0) this.y = canvas.height; }
+            draw() { ctx.globalAlpha = this.opacity; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
-
-        function createParticles() {
-            for (let i = 0; i < 150; i++) {
-                particles.push(new Particle());
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animate);
-        }
-
-        createParticles();
+        for (let i = 0; i < 150; i++) particles.push(new Particle());
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
         animate();
     </script>
 </body>
