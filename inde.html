@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta Regresiva | Año Nuevo 2026</title>
+    <style>
+        /* Estilos Generales */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Fondo de Estrellas Animado */
+        .stars-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Contenedor Principal */
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+            max-width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            background: linear-gradient(to right, #fff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* El Contador */
+        .countdown {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            min-width: 100px;
+        }
+
+        .box span {
+            display: block;
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .box p {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ccc;
+        }
+
+        /* Mensaje de Feliz Año */
+        #message {
+            font-size: 3rem;
+            display: none;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px gold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsivo para móviles */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.5rem; }
+            .box { min-width: 70px; }
+            .box span { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars-container" id="stars"></div>
+
+    <div class="container">
+        <h1 id="title">Faltan para 2026</h1>
+        
+        <div class="countdown" id="countdown">
+            <div class="box">
+                <span id="days">00</span>
+                <p>Días</p>
+            </div>
+            <div class="box">
+                <span id="hours">00</span>
+                <p>Horas</p>
+            </div>
+            <div class="box">
+                <span id="minutes">00</span>
+                <p>Minutos</p>
+            </div>
+            <div class="box">
+                <span id="seconds">00</span>
+                <p>Segundos</p>
+            </div>
+        </div>
+
+        <div id="message">¡FELIZ AÑO NUEVO 2026! 🥂✨</div>
+    </div>
+
+    <script>
+        // Configurar la fecha del objetivo (1 de enero de 2026)
+        const targetDate = new Date('Jan 1, 2026 00:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            // Cálculos de tiempo
+            const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((difference % (1000 * 60)) / 1000);
+
+            // Mostrar resultados con ceros a la izquierda
+            document.getElementById('days').innerText = d < 10 ? '0' + d : d;
+            document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
+            document.getElementById('minutes').innerText = m < 10 ? '0' + m : m;
+            document.getElementById('seconds').innerText = s < 10 ? '0' + s : s;
+
+            // Si la cuenta llega a cero
+            if (difference < 0) {
+                clearInterval(interval);
+                document.getElementById('countdown').style.display = 'none';
+                document.getElementById('title').style.display = 'none';
+                document.getElementById('message').style.display = 'block';
+                createFireworks();
+            }
+        }
+
+        // Ejecutar cada segundo
+        const interval = setInterval(updateCountdown, 1000);
+
+        // Crear estrellas de fondo de forma aleatoria
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.style.position = 'absolute';
+                star.style.width = '2px';
+                star.style.height = '2px';
+                star.style.background = 'white';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.borderRadius = '50%';
+                star.style.opacity = Math.random();
+                star.style.animation = `twinkle ${Math.random() * 5 + 2}s infinite`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Añadir animación de parpadeo a las estrellas
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes twinkle {
+                0%, 100% { opacity: 0.3; }
+                50% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        createStars();
+        updateCountdown(); // Ejecutar inmediatamente al cargar
+    </script>
+</body>
+</html>
